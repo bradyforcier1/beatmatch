@@ -2,12 +2,6 @@
 
 A React Native app that matches your Spotify music to your running cadence in real time. BeatMatch uses your phone's motion sensors to detect your steps per minute and automatically adjusts which songs are playing to keep the tempo in sync with your pace.
 
-## ⚠️ Known Limitation: Track BPM Display
-
-The "track BPM" label shown on the now-playing card does not work and will never display for apps registered after November 2024. It relies on Spotify's `/audio-features` and `/audio-analysis` endpoints, both of which return `403 Forbidden` for newer app registrations — Spotify deprecated them and blocked access at the platform level. There is no workaround via the Spotify Web API. A future fix would require a third-party BPM lookup service (e.g. GetSongBPM) or client-side audio analysis.
-
-The recommendation engine and cadence detection are unaffected.
-
 ## Features
 
 - Detects running cadence (steps per minute) via device accelerometer
@@ -39,7 +33,10 @@ The recommendation engine and cadence detection are unaffected.
 
    ```
    EXPO_PUBLIC_SPOTIFY_CLIENT_ID=your_spotify_client_id_here
+   EXPO_PUBLIC_GETSONGBPM_API_KEY=your_getsongbpm_api_key_here
    ```
+
+   Register for a free GetSongBPM API key at [getsongbpm.com/api](https://getsongbpm.com/api).
 
 3. In your Spotify Developer Dashboard, add `beatmatch://` as a Redirect URI.
 
@@ -66,4 +63,5 @@ src/
 - [Expo Sensors](https://docs.expo.dev/versions/latest/sdk/sensors/) — accelerometer for cadence
 - [Expo Auth Session](https://docs.expo.dev/versions/latest/sdk/auth-session/) — Spotify OAuth
 - [Zustand](https://zustand-demo.pmnd.rs/) — state management
+- [GetSongBPM](https://getsongbpm.com) — track tempo lookup
 - TypeScript

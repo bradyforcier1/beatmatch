@@ -97,23 +97,6 @@ export async function getRecommendations(
   return tracks.sort(() => Math.random() - 0.5);
 }
 
-export async function getTrackTempo(token: string, trackId: string): Promise<number | null> {
-  // Try audio-features first (lighter payload, same deprecation tier)
-  const featUrl = `${BASE}/audio-features/${trackId}`;
-  console.log('[spotify] audio-features:', featUrl);
-  const featRes = await fetch(featUrl, { headers: h(token) });
-  const feat = await logResponse('audio-features', featRes);
-  if (featRes.ok && typeof (feat as { tempo?: number }).tempo === 'number') {
-    return Math.round((feat as { tempo: number }).tempo);
-  }
-  // Fall back to audio-analysis
-  const analysisUrl = `${BASE}/audio-analysis/${trackId}`;
-  console.log('[spotify] audio-analysis:', analysisUrl);
-  const analysisRes = await fetch(analysisUrl, { headers: h(token) });
-  const analysis = await logResponse('audio-analysis', analysisRes) as { track?: { tempo?: number } };
-  if (!analysisRes.ok) return null;
-  return typeof analysis.track?.tempo === 'number' ? Math.round(analysis.track.tempo) : null;
-}
 
 export async function getPlaybackState(token: string): Promise<PlaybackState | null> {
   const url = `${BASE}/me/player`;

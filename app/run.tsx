@@ -18,7 +18,6 @@ import { useSpotify } from '../src/hooks/useSpotify';
 import {
   getRecommendations,
   getPlaybackState,
-  getTrackTempo,
   setVolume,
   skipToNext,
   previousTrack,
@@ -27,6 +26,7 @@ import {
   addToQueue,
   SpotifyTrack,
 } from '../src/services/spotify';
+import { getSongTempo } from '../src/services/bpm';
 
 const CROSSFADE_STEPS = 10;
 const CROSSFADE_STEP_MS = 200; // 2s total
@@ -46,16 +46,13 @@ export default function RunScreen() {
 
   useEffect(() => {
     if (!currentTrack) { setTrackTempo(null); return; }
-    getValidToken()
-      .then((token) => getTrackTempo(token, currentTrack.id))
+    const artist = currentTrack.artists[0]?.name ?? '';
+    getSongTempo(currentTrack.name, artist)
       .then((tempo) => {
-        if (tempo == null) console.warn('[BeatMatch] No tempo returned for track:', currentTrack.name, currentTrack.id);
+        if (tempo == null) console.warn('[BeatMatch] No tempo found for:', currentTrack.name, artist);
         setTrackTempo(tempo);
       })
-      .catch(() => {
-        console.warn('[BeatMatch] Failed to fetch tempo for track:', currentTrack.name, currentTrack.id);
-        setTrackTempo(null);
-      });
+      .catch(() => setTrackTempo(null));
   }, [currentTrack?.id]);
 
   const [starting, setStarting] = useState(false);
@@ -136,6 +133,33 @@ export default function RunScreen() {
   crossfadeRef.current = crossfadeToNext;
   const queueRef = useRef(queueNextTrack);
   queueRef.current = queueNextTrack;
+
+  const currentTrackRef = useRef(currentTrack);
+  currentTrackRef.current = currentTrack;
+  const deviceIdRef = useRef(deviceId);
+  deviceIdRef.current = deviceId;
+
+  useEffect(() => {
+    if (!isRunning) return;
+    const id = setInterval(async () => {
+      if (isCrossfading.current) return;
+      try {
+        const token = await getValidToken();
+        const state = await getPlaybackState(token);
+        if (!state) return;
+        if (state.item && state.item.id !== currentTrackRef.current?.id) {
+          setCurrentTrack(state.item as SpotifyTrack);
+        }
+        setIsPlaying(state.is_playing);
+        if (state.device?.id && state.device.id !== deviceIdRef.current) {
+          setDeviceId(state.device.id);
+        }
+      } catch {
+        // ignore transient polling errors
+      }
+    }, 5000);
+    return () => clearInterval(id);
+  }, [isRunning, getValidToken]);
 
   const onSignificantChange = useCallback((bpm: number) => {
     const delta = Math.abs(bpm - lastBPM.current);
