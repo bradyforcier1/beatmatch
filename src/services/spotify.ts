@@ -61,7 +61,10 @@ export async function getRecommendations(
 ): Promise<SpotifyTrack[]> {
   const { ids, genres } = await getTopArtistData(token);
 
-  // Preferred path: /recommendations supports target_tempo + personal seeds
+  // NOTE: /recommendations was deprecated for new apps after Nov 2024 and returns 404.
+  // We still try it first in case it's re-enabled, then fall back to genre search.
+  // The genre search fallback has a much smaller catalog and no BPM filtering,
+  // so track matching quality is significantly worse.
   if (ids.length > 0) {
     const params = new URLSearchParams({
       seed_artists: ids.slice(0, 3).join(','),

@@ -56,6 +56,10 @@ src/
   store/      # Zustand run state
 ```
 
+## Known Limitations
+
+Spotify deprecated the `/recommendations` and `/audio-features` endpoints for new apps after November 2024. BeatMatch attempts to use `/recommendations` first (which supports BPM filtering), but it returns 404 for newer app registrations. The fallback is a genre search via `/search`, which has no tempo filtering and a much smaller catalog — so track matching quality is noticeably worse.
+
 ## Tech Stack
 
 - [Expo](https://expo.dev/) / React Native
