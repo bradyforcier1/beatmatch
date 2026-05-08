@@ -1,0 +1,34 @@
+{
+  "expo": {
+    "name": "BeatMatch",
+    "slug": "beatmatch",
+    "version": "1.0.0",
+    "scheme": "beatmatch",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "dark",
+    "splash": {
+      "backgroundColor": "#0f0f0f"
+    },
+    "ios": {
+      "bundleIdentifier": "com.beatmatch.app",
+      "supportsTablet": false,
+      "infoPlist": {
+        "NSMotionUsageDescription": "BeatMatch uses motion sensors to detect your running cadence and match music to your tempo."
+      }
+    },
+    "android": {
+      "package": "com.beatmatch.app",
+      "permissions": ["android.permission.BODY_SENSORS", "android.permission.ACTIVITY_RECOGNITION"]
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-sensors",
+        {
+          "motionPermission": "Allow BeatMatch to detect your running cadence."
+        }
+      ]
+    ]
+  }
+}
